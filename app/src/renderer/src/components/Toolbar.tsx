@@ -1,7 +1,6 @@
 import SwitchBranchDialog from '@/components/dialogs/SwitchBranchDialog'
 import { Button } from '@/components/shadcn/Button'
 import useStore, { useSelectedWorkspace } from '@/stores/store'
-import { count } from 'console'
 import { Download, GitGraph, GitMerge, GitPullRequestArrow, GitPullRequestCreate, RotateCw, Terminal, Upload } from 'lucide-react'
 import { ReactElement, useState } from 'react'
 import Counter from './Counter'
