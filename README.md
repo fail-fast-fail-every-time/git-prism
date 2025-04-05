@@ -1,4 +1,4 @@
-# Git Prism – One view, total control
+# Git Prism – One view, total control 🦄
 
 Git Prism is a git client built to simplify the management of projects with multiple repositories. Keep track of branches, uncommitted changes, and pending pulls across all repositories. Execute commands such as pull on multiple repositories with a single button.
 
