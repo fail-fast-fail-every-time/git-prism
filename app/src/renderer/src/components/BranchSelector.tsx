@@ -22,8 +22,10 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
   const handleSelectValue = async (newBranch: string): Promise<void> => {
     if (newBranch != repo.branch) {
       setOpen(false)
-      runRepoCommand(async () => await repo.checkoutBranch(newBranch), [repo])
-      addRecentBranch(repo.path, newBranch)
+      await runRepoCommand(async () => await repo.checkoutBranch(newBranch), [repo])
+      if (repo.branch && !repo.lastError) {
+        addRecentBranch(repo.path, repo.branch)
+      }
     }
   }
 
