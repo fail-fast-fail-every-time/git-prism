@@ -22,7 +22,7 @@ export default function FileDiff({ diff, repoBasePath }: FileDiffProps): ReactEl
     <div className="bg-secondary mt-0 px-5 py-3">
       <div>
         <div className="float-right">
-          <Tabs defaultValue={'split'} className="flex flex-col flex-grow min-h-0">
+          <Tabs defaultValue={diffViewType} className="flex flex-col flex-grow min-h-0">
             <div className="">
               <TabsList>
                 <TabsTrigger value="unified" onClick={() => setDiffViewType('unified')}>
