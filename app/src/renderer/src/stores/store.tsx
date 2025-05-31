@@ -16,6 +16,7 @@ export interface StoreState {
   reposLastFetched: Date
   reposProcessing: string[]
   recentBranchesPerRepo: Record<string, string[]>
+  diffViewType: 'split' | 'unified'
   initialize: () => void
   persist: () => void
   setSettings: (settings: Settings) => void
@@ -34,6 +35,7 @@ export interface StoreState {
   deleteWorkspace: (workspaceName: string) => void
   runCommandOnRepositories: (command: RepositoryCommand, reposToRunOn?: Repository[], showSpinner?: boolean) => Promise<void>
   getSelectedWorkspace: () => Workspace | undefined
+  setDiffViewType: (viewType: 'split' | 'unified') => void
 }
 
 export const useStore = create<StoreState>()((set, get) => ({
@@ -46,9 +48,16 @@ export const useStore = create<StoreState>()((set, get) => ({
   reposLastFetched: new Date(),
   reposProcessing: [],
   recentBranchesPerRepo: {},
+  diffViewType: 'unified',
   setSettings: (settings: Settings): void => {
     set(() => ({
       settings: settings
+    }))
+    get().persist()
+  },
+  setDiffViewType: (viewType: 'split' | 'unified'): void => {
+    set(() => ({
+      diffViewType: viewType
     }))
     get().persist()
   },

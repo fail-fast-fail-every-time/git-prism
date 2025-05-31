@@ -13,6 +13,7 @@ interface AppDataFile {
   recentCommands: string[]
   recentBranches: Record<string, string[]>
   reposLastFetched: Date
+  diffViewType?: 'unified' | 'split'
   workspaces: {
     name: string
     selected: boolean
@@ -60,6 +61,7 @@ async function loadStoreFromFile(): Promise<Partial<StoreState>> {
     recentCommands: appData.recentCommands ?? [],
     recentBranchesPerRepo: appData.recentBranches ?? {},
     reposLastFetched: appData.reposLastFetched,
+    diffViewType: appData.diffViewType ?? 'unified',
     workspaces
   }
 }
@@ -70,6 +72,7 @@ function convertStoreStateToAppData(state: StoreState): AppDataFile {
     recentCommands: state.recentCommands,
     recentBranches: state.recentBranchesPerRepo,
     reposLastFetched: state.reposLastFetched,
+    diffViewType: state.diffViewType,
     workspaces: state.workspaces.map((workspace: Workspace) => {
       return {
         name: workspace.name,
