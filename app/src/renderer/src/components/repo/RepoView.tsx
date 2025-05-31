@@ -1,6 +1,6 @@
 import useKeyPressed from '@/hooks/useKeyPressed'
 import Repository from '@/models/Repository'
-import { X } from 'lucide-react'
+import { History, PencilLine, X } from 'lucide-react'
 import { ReactElement, useEffect, useState } from 'react'
 import BranchSelector from '../BranchSelector'
 import CopyButton from '../CopyButton'
@@ -40,8 +40,14 @@ export default function RepoView({ repo, onCancel }: RepoViewProps): ReactElemen
           <Tabs defaultValue={repo.files.length > 0 ? 'changes' : 'history'} className="flex flex-col flex-grow min-h-0">
             <div className="">
               <TabsList>
-                <TabsTrigger value="changes">Changes ({repo.files.length})</TabsTrigger>
-                <TabsTrigger value="history">History</TabsTrigger>
+                <TabsTrigger value="changes">
+                  <PencilLine className="mr-1" size="16" />
+                  Changes ({repo.files.length})
+                </TabsTrigger>
+                <TabsTrigger value="history">
+                  <History className="mr-1" size="16" />
+                  History
+                </TabsTrigger>
               </TabsList>
             </div>
             <TabsContent value="changes" className="min-h-0">
