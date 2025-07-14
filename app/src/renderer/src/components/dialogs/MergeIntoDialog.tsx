@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shadcn/Dialog'
 import Repository from '@/models/Repository'
 import useStore, { useSelectedWorkspace } from '@/stores/store'
-import { ReactElement, useMemo } from 'react'
+import { ReactElement, useMemo, useState } from 'react'
 import { getLocalBranchesFromRepositoryList as getBranchesFromRepositoryList } from '../../Util'
 import { BranchList } from '../BranchList'
+import Spinner from '../Spinner'
 
 interface MergeIntoDialogProps {
   onClose: () => void
@@ -11,6 +12,7 @@ interface MergeIntoDialogProps {
 }
 
 export default function MergeIntoDialog({ onClose, repository }: MergeIntoDialogProps): ReactElement {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const selectedWorkspace = useSelectedWorkspace()
   const runCommand = useStore((store) => store.runCommandOnRepositories)
   const branches = useMemo(() => getBranchesFromRepositoryList([repository], false), [repository])
@@ -20,14 +22,19 @@ export default function MergeIntoDialog({ onClose, repository }: MergeIntoDialog
     return <></>
   }
 
-  const handleSelectBranch = (selectedBranch: string): void => {
+  const handleSelectBranch = async (selectedBranch: string): Promise<void> => {
+    setIsLoading(true)
     const currentBranch = repository.branch
     if (currentBranch) {
-      runCommand((r) => r.checkoutBranch(selectedBranch), [repository])
-      if (!repository.lastError) {
-        runCommand((r) => r.merge(currentBranch), [repository])
-      }
+      await runCommand(
+        async (r) => {
+          await r.checkoutBranch(selectedBranch)
+          await r.merge(currentBranch)
+        },
+        [repository]
+      )
     }
+    setIsLoading(false)
     onClose()
   }
 
@@ -40,7 +47,8 @@ export default function MergeIntoDialog({ onClose, repository }: MergeIntoDialog
             Merge <b>{repository.branch}</b> into another branch on <b>{repository.name}</b>
           </DialogDescription>
         </DialogHeader>
-        <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={handleSelectBranch} />
+        {isLoading && <Spinner />}
+        {!isLoading && <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={handleSelectBranch} />}
       </DialogContent>
     </Dialog>
   )
