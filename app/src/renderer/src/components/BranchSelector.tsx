@@ -19,13 +19,17 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
   const recentBranches = useStore((store) => store.recentBranchesPerRepo[repo.path]) || []
   const allBranchesExceptRecentBranches = getBranchList(repo, true).filter((branch) => !recentBranches?.includes(branch))
 
+  // Ensure the current branch is always on top of the most recent branches list
+  if (repo.branch && repo.branch !== recentBranches[0]) {
+    addRecentBranch(repo.path, repo.branch)
+  }
+
+  // Handle branch selection
   const handleSelectValue = async (newBranch: string): Promise<void> => {
+    // Only checkout if the selected branch is different from the current one
     if (newBranch != repo.branch) {
       setOpen(false)
       await runRepoCommand(async () => await repo.checkoutBranch(newBranch), [repo])
-      if (repo.branch && !repo.lastError) {
-        addRecentBranch(repo.path, repo.branch)
-      }
     }
   }
 

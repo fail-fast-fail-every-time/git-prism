@@ -88,6 +88,7 @@ export const useStore = create<StoreState>()((set, get) => ({
     }))
   },
   addRecentBranch: (repoPath: string, branch: string): void => {
+    branch = branch.replace('remotes/origin/', '').replace('origin/', '')
     set((state) => {
       const recentBranches = state.recentBranchesPerRepo[repoPath] ?? []
       const filteredBranches = recentBranches.filter((b) => b !== branch)
