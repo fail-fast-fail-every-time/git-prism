@@ -2,7 +2,8 @@ import { Button } from '@/components/shadcn/Button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/Dialog'
 import Repository, { GitChange } from '@/models/Repository'
 import useStore from '@/stores/store'
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
+import Spinner from '../Spinner'
 
 interface DiscardFilesDialogProps {
   changes: GitChange[]
@@ -12,16 +13,23 @@ interface DiscardFilesDialogProps {
 }
 
 export default function DiscardFilesDialog({ changes, repo, onFilesDiscarded, onClose }: DiscardFilesDialogProps): ReactElement {
+  const [isLoading, setIsLoading] = useState(false)
   const runCommand = useStore((store) => store.runCommandOnRepositories)
 
   const handleDiscardChanges = async (): Promise<void> => {
-    changes.forEach((change) => {
-      if (change.untracked) {
+    setIsLoading(true)
+    const trackedChanges = changes.filter((change) => !change.untracked)
+    if (trackedChanges.length > 0) {
+      await runCommand(() => repo.discardChanges(trackedChanges.map((c) => c.filePath)), [repo])
+    }
+
+    const untrackedChanges = changes.filter((change) => change.untracked)
+    if (untrackedChanges.length > 0) {
+      untrackedChanges.forEach((change) => {
         window.api.io.deleteFile(window.api.io.joinPaths(repo.path, change.filePath))
-      } else {
-        runCommand(() => repo.discardChanges(change.filePath), [repo])
-      }
-    })
+      })
+    }
+    setIsLoading(false)
     onFilesDiscarded()
     onClose()
   }
@@ -38,11 +46,11 @@ export default function DiscardFilesDialog({ changes, repo, onFilesDiscarded, on
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant={'outline'} type="submit" onClick={onClose}>
+          <Button variant={'outline'} type="submit" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" onClick={handleDiscardChanges}>
-            Discard Changes
+          <Button type="submit" onClick={handleDiscardChanges} disabled={isLoading}>
+            {isLoading ? <span className="flex items-center gap-2">{<Spinner />} Discarding...</span> : 'Discard Changes'}
           </Button>
         </DialogFooter>
       </DialogContent>

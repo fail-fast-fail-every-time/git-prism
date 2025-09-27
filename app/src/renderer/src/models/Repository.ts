@@ -233,8 +233,9 @@ export default class Repository {
     }
   }
 
-  public async discardChanges(filePath: string): Promise<void> {
-    const checkoutResult = await this.execute(() => window.api.git.checkout(this.path, ['--', filePath]))
+  public async discardChanges(filePaths: string[]): Promise<void> {
+    const options = ['--', ...filePaths]
+    const checkoutResult = await this.execute(() => window.api.git.checkout(this.path, options))
     console.log('Git discard file', this.name, checkoutResult)
     if (!this.lastError) {
       await this.refresh()
