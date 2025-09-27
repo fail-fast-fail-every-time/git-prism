@@ -49,10 +49,25 @@ export default function RepoChangesFileList({
   }
 
   const handleChangeClicked = (event, change: GitChange): void => {
+    //React to left click
     if (event.button === 0) {
-      if (event.ctrlKey) {
+      if (event.shiftKey) {
+        //Range select when shift is pressed
+        const lastSelectedFile = selectedFiles[selectedFiles.length - 1]
+        if (lastSelectedFile) {
+          const lastIndex = changes.findIndex((c) => c.filePath === lastSelectedFile.filePath)
+          const currentIndex = changes.findIndex((c) => c.filePath === change.filePath)
+          const start = Math.min(lastIndex, currentIndex)
+          const end = Math.max(lastIndex, currentIndex)
+          setSelectedFiles([...new Set([...selectedFiles, ...changes.slice(start, end + 1)])])
+        } else {
+          setSelectedFiles([change])
+        }
+      } else if (event.ctrlKey) {
+        //Add to selection when ctrl is pressed
         setSelectedFiles([...selectedFiles, change])
       } else {
+        //Single select
         setSelectedFiles([change])
       }
     }
@@ -84,7 +99,7 @@ export default function RepoChangesFileList({
         <Checkbox onCheckedChange={toggleAllFiles} checked={changes.every((c) => checkedFiles[c.filePath] === true)} />
         <div className="font-semibold">Changed files</div>
       </div>
-      <div className="mb-2">
+      <div className="mb-2 select-none">
         {changes.map((change: GitChange) => {
           const isSelected = selectedFiles.some((c) => c.filePath == change.filePath)
           return (
