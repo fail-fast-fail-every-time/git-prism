@@ -29,6 +29,7 @@ export default function DiscardFilesDialog({ changes, repo, onFilesDiscarded, on
         window.api.io.deleteFile(window.api.io.joinPaths(repo.path, change.filePath))
       })
     }
+    await runCommand(() => repo.refresh(), [repo])
     setIsLoading(false)
     onFilesDiscarded()
     onClose()

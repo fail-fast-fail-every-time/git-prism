@@ -59,7 +59,7 @@ export default function RepoChangesFileList({
           const currentIndex = changes.findIndex((c) => c.filePath === change.filePath)
           const start = Math.min(lastIndex, currentIndex)
           const end = Math.max(lastIndex, currentIndex)
-          setSelectedFiles([...new Set([...selectedFiles, ...changes.slice(start, end + 1)])])
+          setSelectedFiles([...selectedFiles, ...changes.slice(start, end + 1)])
         } else {
           setSelectedFiles([change])
         }

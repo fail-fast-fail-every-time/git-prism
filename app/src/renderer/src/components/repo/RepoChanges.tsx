@@ -75,7 +75,7 @@ export default function RepoChanges({ repo }: RepoChangesProps): ReactElement {
         <RepoChangesFileList
           repo={repo}
           selectedFiles={selectedFiles}
-          setSelectedFiles={setSelectedFiles}
+          setSelectedFiles={(files) => setSelectedFiles(distinctChanges(files))}
           checkedFiles={checkedFiles}
           toggleFile={toggleFile}
           toggleAllFiles={toggleAllFiles}
@@ -123,4 +123,13 @@ function RebaseButtons({ onContinue, onAbort }: { onContinue: () => Promise<void
       </Button>
     </div>
   )
+}
+
+//Makse an array of GitChange objects unique based on the filePath
+function distinctChanges(changes: GitChange[]): GitChange[] {
+  const uniqueChanges: Record<string, GitChange> = {}
+  changes.forEach((change) => {
+    uniqueChanges[change.filePath] = change
+  })
+  return Object.values(uniqueChanges)
 }
