@@ -144,7 +144,13 @@ body,
   height: 60px;
 }
 
-/* https://github.com/shadcn-ui/ui/issues/1859 */
+
 body {
+  /* https://github.com/shadcn-ui/ui/issues/1859 */
   pointer-events: auto !important;
+}
+
+* {
+  outline: none !important;
+  box-shadow: none !important;
 }
