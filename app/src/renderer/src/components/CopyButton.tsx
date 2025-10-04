@@ -7,10 +7,11 @@ import { Button } from './shadcn/Button'
 export default function CopyButton({ text, className }: { text: string; className?: string }): ReactElement {
   const [copied, setCopied] = useState(false)
 
-  const handleCopy = async (): Promise<void> => {
+  const handleCopy = async (e): Promise<void> => {
+    e.stopPropagation()
     await navigator.clipboard.writeText(text)
     setCopied(true)
-    setTimeout(() => setCopied(false), 3000)
+    setTimeout(() => setCopied(false), 1500)
   }
 
   return (

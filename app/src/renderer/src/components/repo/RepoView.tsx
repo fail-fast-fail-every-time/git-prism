@@ -3,7 +3,6 @@ import Repository from '@/models/Repository'
 import { History, PencilLine, X } from 'lucide-react'
 import { ReactElement, useEffect, useState } from 'react'
 import BranchSelector from '../BranchSelector'
-import CopyButton from '../CopyButton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../shadcn/tabs'
 import RepoChanges from './RepoChanges'
 import RepoHistory from './RepoHistory'
@@ -34,7 +33,6 @@ export default function RepoView({ repo, onCancel }: RepoViewProps): ReactElemen
             <div>{repo.name}</div>
             <div>
               <BranchSelector repo={repo} />
-              <CopyButton text={repo.branch ?? ''} className="ml-[-5px] p-2" />
             </div>
           </div>
           <Tabs defaultValue={repo.files.length > 0 ? 'changes' : 'history'} className="flex flex-col flex-grow min-h-0">
