@@ -1,7 +1,7 @@
 import Repository from '@/models/Repository'
 import useStore from '@/stores/store'
 import { getBranchList } from '@/Util'
-import { Check, ChevronDown, GitBranch } from 'lucide-react'
+import { Check, ChevronDown, GitBranch, GitBranchIcon } from 'lucide-react'
 import { ReactElement, useState } from 'react'
 import { cn } from 's/lib/utils'
 import { Button } from './shadcn/Button'
@@ -19,14 +19,14 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
   const recentBranches = useStore((store) => store.recentBranchesPerRepo[repo.path]) || []
   const allBranchesExceptRecentBranches = getBranchList(repo, true).filter((branch) => !recentBranches?.includes(branch))
 
-  // Ensure the current branch is always on top of the most recent branches list
+  //Ensure the current branch is always on top of the most recent branches list
   if (repo.branch && repo.branch !== recentBranches[0]) {
     addRecentBranch(repo.path, repo.branch)
   }
 
-  // Handle branch selection
+  //Handle branch selection
   const handleSelectValue = async (newBranch: string): Promise<void> => {
-    // Only checkout if the selected branch is different from the current one
+    //Only checkout if the selected branch is different from the current one
     if (newBranch != repo.branch) {
       setOpen(false)
       await runRepoCommand(async () => await repo.checkoutBranch(newBranch), [repo])
@@ -42,7 +42,7 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
           <ChevronDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-[300px]" onClick={(e) => e.stopPropagation()}>
+      <PopoverContent className="p-0 w-[450px]" onClick={(e) => e.stopPropagation()}>
         <Command>
           <CommandInput placeholder="Search branch..." />
           <CommandList>
@@ -87,7 +87,8 @@ function BranchCommandItem({
 }): ReactElement {
   return (
     <CommandItem value={branch} onSelect={onSelect}>
-      <Check className={cn('mr-2 h-4 w-4', selected ? 'opacity-100' : 'opacity-0')} />
+      {selected && <Check className="mr-2 w-4 h-4" />}
+      {!selected && <GitBranchIcon className="mr-2 w-4 h-4" />}
       {branch}
     </CommandItem>
   )
