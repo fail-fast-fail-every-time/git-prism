@@ -7,6 +7,7 @@ import CopyButton from './CopyButton'
 import { Button } from './shadcn/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './shadcn/command'
 import { Popover, PopoverContent, PopoverTrigger } from './shadcn/popover'
+import { Tooltip, TooltipContent, TooltipTrigger } from './shadcn/Tooltip'
 
 interface BranchSelectorProps {
   repo: Repository
@@ -34,34 +35,22 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
   }
 
   return (
-    <div className="group flex flex-nowrap gap-2">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" role="combobox" aria-expanded={open} className="justify-start px-2" onClick={(e) => e.stopPropagation()}>
-            <GitBranch size={14} className="inline-block" />
-            <div className="max-w-[300px] truncate">{repo.branch}</div>
-            <ChevronDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="p-0 w-[450px]" onClick={(e) => e.stopPropagation()}>
-          <Command>
-            <CommandInput placeholder="Search branch..." />
-            <CommandList>
-              <CommandEmpty>No branches found.</CommandEmpty>
-              {recentBranches.length > 0 && (
-                <CommandGroup heading="Recent branches">
-                  {recentBranches.map((branch: string) => (
-                    <BranchCommandItem
-                      key={branch}
-                      branch={branch}
-                      onSelect={() => handleSelectValue(branch)}
-                      selected={repo.branch === branch}
-                    />
-                  ))}
-                </CommandGroup>
-              )}
-              <CommandGroup heading={recentBranches.length > 0 ? 'Other Branches' : 'Branches'}>
-                {allBranchesExceptRecentBranches.map((branch: string) => (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" role="combobox" aria-expanded={open} className="justify-start px-2" onClick={(e) => e.stopPropagation()}>
+          <GitBranch size={14} className="inline-block" />
+          <div className="max-w-[300px] truncate">{repo.branch}</div>
+          <ChevronDown className="opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-[450px]" onClick={(e) => e.stopPropagation()}>
+        <Command>
+          <CommandInput placeholder="Search branch..." />
+          <CommandList>
+            <CommandEmpty>No branches found.</CommandEmpty>
+            {recentBranches.length > 0 && (
+              <CommandGroup heading="Recent branches">
+                {recentBranches.map((branch: string) => (
                   <BranchCommandItem
                     key={branch}
                     branch={branch}
@@ -70,12 +59,21 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
                   />
                 ))}
               </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-      <CopyButton text={repo.branch ?? ''} className="opacity-0 group-hover:opacity-100 ml-[-5px] p-2 transition-opacity duration-300" />
-    </div>
+            )}
+            <CommandGroup heading={recentBranches.length > 0 ? 'Other Branches' : 'Branches'}>
+              {allBranchesExceptRecentBranches.map((branch: string) => (
+                <BranchCommandItem
+                  key={branch}
+                  branch={branch}
+                  onSelect={() => handleSelectValue(branch)}
+                  selected={repo.branch === branch}
+                />
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -89,10 +87,16 @@ function BranchCommandItem({
   selected: boolean
 }): ReactElement {
   return (
-    <CommandItem value={branch} onSelect={onSelect}>
+    <CommandItem value={branch} onSelect={onSelect} className="group flex cursor-pointer">
       {selected && <Check className="mr-2 w-4 h-4" />}
       {!selected && <GitBranchIcon className="mr-2 w-4 h-4" />}
-      {branch}
+      <div className="flex-1">{branch}</div>
+      <Tooltip>
+        <TooltipTrigger>
+          <CopyButton text={branch} className="opacity-0 group-hover:opacity-100 pr-0 h-6" />
+        </TooltipTrigger>
+        <TooltipContent>Copy branch name</TooltipContent>
+      </Tooltip>
     </CommandItem>
   )
 }
