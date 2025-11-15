@@ -119,7 +119,7 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
             </TableCell>
             <TableCell className="min-w-20">
               {processing && <Spinner />}
-              {!processing && repository.lastError && <RepositoryTableError lastError={repository.lastError} />}
+              {!processing && repository.lastError && <RepositoryTableError repo={repository} />}
             </TableCell>
             <TableCell>
               <Ellipsis size={20} onClick={showContextMenuOnLeftClick} />

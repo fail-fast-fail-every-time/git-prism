@@ -12,7 +12,7 @@ export interface IApi {
     basename: (path: string) => string
     dirname: (path: string) => string
     joinPaths: (...paths: string[]) => string
-    exec: (command: string, options: string[]) => Promise<boolean>
+    exec: (command: string, options: string[], workingDirectory?: string) => Promise<{ success: boolean; stdout: string; stderr: string }>
   }
   git: {
     status: (path: string) => Promise<StatusResult>

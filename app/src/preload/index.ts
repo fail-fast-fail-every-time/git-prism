@@ -127,12 +127,40 @@ function joinPaths(...paths: string[]): string {
   return path.join(...paths)
 }
 
-async function exec(command: string, args: string[] = []): Promise<boolean> {
-  console.log('Execute', command)
-  const child = spawn(`"${command}"`, args, { shell: true })
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return child.exitCode !== 1
+async function exec(command: string, args: string[] = [], cwd?: string): Promise<{ success: boolean; stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { shell: true, cwd })
+
+    let stdout = ''
+    let stderr = ''
+
+    child.stdout.on('data', (data) => {
+      stdout += data.toString()
+    })
+
+    child.stderr.on('data', (data) => {
+      stderr += data.toString()
+    })
+
+    child.on('error', (err) => {
+      console.log('Command failed', command, err, stdout, stderr)
+      reject(err)
+    })
+
+    child.on('close', (code) => {
+      console.log('command executed with success', code, stdout, stderr)
+      const success = code === 0
+      resolve({ success, stdout, stderr })
+    })
+  })
 }
+
+// async function exec(command: string, args: string[] = [], workingDirectory = null): Promise<boolean> {
+//   console.log('Execute', command)
+//   const child = spawn(`"${command}"`, args, { shell: true, cwd: workingDirectory ?? undefined })
+//   await new Promise((resolve) => setTimeout(resolve, 500))
+//   return child.exitCode !== 1
+// }
 
 async function status(path: string): Promise<StatusResult> {
   const git: SimpleGit = simpleGit(path)
