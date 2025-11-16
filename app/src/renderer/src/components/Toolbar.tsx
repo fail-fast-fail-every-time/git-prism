@@ -7,7 +7,7 @@ import Counter from './Counter'
 import CreateBranchDialog from './dialogs/CreateBranchDialog'
 import MergeBranchDialog from './dialogs/MergeBranchDialog'
 import RebaseDialog from './dialogs/RebaseDialog'
-import RunCommandDialog from './dialogs/RunCommandDialog'
+import RunCommandDialog from './dialogs/commands/CommandListDialog'
 
 export default function Toolbar(): ReactElement {
   const [showSwitchBranch, setShowSwitchBranch] = useState<boolean>(false)
