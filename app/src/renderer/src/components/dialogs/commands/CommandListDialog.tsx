@@ -34,7 +34,7 @@ export default function RunCommandDialog({ onClose }: RunCommandDialogProps): Re
         <DialogHeader>
           <DialogTitle>Custom commands</DialogTitle>
           <DialogDescription>
-            Define a new custom command to run a specific command on multiple repositories with one click.
+            Define a new custom command to run external commands on multiple repositories from git prism.
           </DialogDescription>
         </DialogHeader>
         <Table>
