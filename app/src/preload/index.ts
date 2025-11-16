@@ -148,19 +148,12 @@ async function exec(command: string, args: string[] = [], cwd?: string): Promise
     })
 
     child.on('close', (code) => {
-      console.log('command executed with success', code, stdout, stderr)
+      console.log('exec command finished executing', code, stdout, stderr)
       const success = code === 0
       resolve({ success, stdout, stderr })
     })
   })
 }
-
-// async function exec(command: string, args: string[] = [], workingDirectory = null): Promise<boolean> {
-//   console.log('Execute', command)
-//   const child = spawn(`"${command}"`, args, { shell: true, cwd: workingDirectory ?? undefined })
-//   await new Promise((resolve) => setTimeout(resolve, 500))
-//   return child.exitCode !== 1
-// }
 
 async function status(path: string): Promise<StatusResult> {
   const git: SimpleGit = simpleGit(path)
