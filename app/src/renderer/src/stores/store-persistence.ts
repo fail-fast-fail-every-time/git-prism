@@ -17,6 +17,7 @@ interface AppDataFile {
   diffViewType?: 'unified' | 'split'
   customCommands?: CustomCommand[]
   workspaces: {
+    id: string
     name: string
     selected: boolean
     repositories: {
@@ -46,12 +47,13 @@ async function loadStoreFromFile(): Promise<Partial<StoreState>> {
   const fileContent = await window.api.io.loadFile(APPDATA_FILENAME)
   console.log('Loaded appdata from filesystem: ' + fileContent)
 
-  //Deserializa file content and map data to StoreState object
+  //Deserialize file content and map data to StoreState object
   const appData = JSON.parse(fileContent) as AppDataFile
 
   const workspaces = appData.workspaces.map(
     (workspace) =>
       new Workspace(
+        workspace.id ?? crypto.randomUUID(),
         workspace.name,
         workspace.repositories.map((repo) => new Repository(repo.name, repo.path)),
         workspace.selected
@@ -79,6 +81,7 @@ function convertStoreStateToAppData(state: StoreState): AppDataFile {
     customCommands: state.customCommands,
     workspaces: state.workspaces.map((workspace: Workspace) => {
       return {
+        id: workspace.id,
         name: workspace.name,
         selected: workspace.selected,
         repositories: workspace.repositories.map((repo: Repository) => {

@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/Dialog'
 import { Input } from '@/components/shadcn/Input'
-import CustomCommand from '@/models/CustomCommand'
+import CustomCommand, { PinSetting } from '@/models/CustomCommand'
 import useStore from '@/stores/store'
 import { ReactElement, useState } from 'react'
 import { FormLabel } from '../../Forms'
@@ -19,6 +19,8 @@ export default function NewCommandDialog({ onClose }: NewCommandDialogProps): Re
     }
     const newCommand: CustomCommand = {
       name: commandName,
+      pinSetting: PinSetting.AllWorkspaces,
+      pinToWorkspaceId: null,
       commandPerRepo: {}
     }
     saveCustomCommand(commandName, newCommand)

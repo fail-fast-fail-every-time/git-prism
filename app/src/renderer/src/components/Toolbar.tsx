@@ -1,5 +1,6 @@
 import SwitchBranchDialog from '@/components/dialogs/SwitchBranchDialog'
 import { Button } from '@/components/shadcn/Button'
+import { PinSetting } from '@/models/CustomCommand'
 import useStore, { useSelectedWorkspace } from '@/stores/store'
 import { Download, GitGraph, GitMerge, GitPullRequestArrow, GitPullRequestCreate, Terminal, Upload } from 'lucide-react'
 import { ReactElement, useState } from 'react'
@@ -36,7 +37,11 @@ export default function Toolbar(): ReactElement {
   const totalAhead = workspace?.repositories.reduce((acc, repo) => acc + (repo.ahead ?? 0), 0) ?? 0
 
   const customCommandsPinnedToToolbar = customCommands
-    .filter((cmd) => cmd.pinToToolbar)
+    .filter(
+      (cmd) =>
+        cmd.pinSetting === PinSetting.AllWorkspaces ||
+        (cmd.pinSetting === PinSetting.Workspace && workspace?.id == cmd.pinToWorkspaceId)
+    )
     .map((cmd) => ({
       text: cmd.name,
       component: Terminal,

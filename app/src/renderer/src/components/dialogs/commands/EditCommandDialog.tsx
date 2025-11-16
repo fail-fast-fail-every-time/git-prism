@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/Dialog'
 import { Input } from '@/components/shadcn/Input'
-import CustomCommand from '@/models/CustomCommand'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
+import CustomCommand, { PinSetting } from '@/models/CustomCommand'
 import useStore, { useSelectedWorkspace } from '@/stores/store'
 import { ReactElement, useState } from 'react'
 import { Button } from '../../shadcn/Button'
-import { Checkbox } from '../../shadcn/checkbox'
 import { Label } from '../../shadcn/Label'
 
 interface EditCommandDialogProps {
@@ -16,6 +16,7 @@ export default function EditCommandDialog({ onClose, command }: EditCommandDialo
   const selectedWorkspace = useSelectedWorkspace()
   const [tempCommand, setTempCommand] = useState<CustomCommand>(structuredClone(command))
   const saveCustomCommand = useStore((store) => store.saveCustomCommand)
+  const workspaces = useStore((store) => store.workspaces)
 
   const setCommandText = (repoPath: string, text: string): void => {
     setTempCommand({
@@ -34,10 +35,18 @@ export default function EditCommandDialog({ onClose, command }: EditCommandDialo
     })
   }
 
-  const setPinToToolbar = (pin: boolean): void => {
+  const setPinSetting = (pinSetting: PinSetting): void => {
     setTempCommand({
       ...tempCommand,
-      pinToToolbar: pin
+      pinSetting: pinSetting,
+      pinToWorkspaceId: pinSetting === PinSetting.Workspace ? (tempCommand.pinToWorkspaceId ?? selectedWorkspace?.id ?? null) : null
+    })
+  }
+
+  const setSelectedWorkspaceId = (workspaceId: string): void => {
+    setTempCommand({
+      ...tempCommand,
+      pinToWorkspaceId: workspaceId
     })
   }
 
@@ -66,8 +75,31 @@ export default function EditCommandDialog({ onClose, command }: EditCommandDialo
             <div className="w-[300px]">
               <Label className="font-semibold">Pin to toolbar</Label>
             </div>
-            <div>
-              <Checkbox checked={tempCommand.pinToToolbar} onCheckedChange={setPinToToolbar} />
+            <div className="flex flex-1 gap-3 1">
+              <Select defaultValue={tempCommand.pinSetting} onValueChange={setPinSetting}>
+                <SelectTrigger>
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={PinSetting.AllWorkspaces}>Pin to toolbar in all workspaces</SelectItem>
+                  <SelectItem value={PinSetting.Workspace}>Pin to toolbar in a specific workspace</SelectItem>
+                  <SelectItem value={PinSetting.None}>Do not pin</SelectItem>
+                </SelectContent>
+              </Select>
+              {tempCommand.pinSetting === PinSetting.Workspace && (
+                <Select defaultValue={tempCommand.pinToWorkspaceId ?? selectedWorkspace?.id} onValueChange={setSelectedWorkspaceId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workspaces.map((workspace) => (
+                      <SelectItem key={workspace.id} value={workspace.id}>
+                        {workspace.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
         </div>
@@ -76,7 +108,8 @@ export default function EditCommandDialog({ onClose, command }: EditCommandDialo
         <div className="pl-3 text-sm">
           <div className="font-semibold">Commands</div>
           <div>
-            Commands are specified separately for each repository. Commands are executed with the default shell (cmd.exe on windows). If you need to run multiple commands, separate them with <code>&amp;&amp;</code> (e.g. <code>git fetch && git pull</code>).
+            Commands are specified separately for each repository. Commands are executed with the default shell (cmd.exe on windows). If you
+            need to run multiple commands, separate them with <code>&amp;&amp;</code> (e.g. <code>git fetch && git pull</code>).
           </div>
         </div>
         {selectedWorkspace && (

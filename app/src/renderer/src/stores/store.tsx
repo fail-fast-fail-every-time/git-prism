@@ -51,7 +51,7 @@ export interface StoreState {
 export const useStore = create<StoreState>()((set, get) => ({
   initialized: false,
   settings: new Settings(),
-  workspaces: [new Workspace('Default workspace', [], true)],
+  workspaces: [new Workspace('-1', 'Default workspace', [], true)],
   globalError: undefined,
   checkedRepos: {},
   recentCommands: [],

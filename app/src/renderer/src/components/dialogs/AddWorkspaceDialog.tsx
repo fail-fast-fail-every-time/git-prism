@@ -27,7 +27,8 @@ export default function AddWorkspaceDialog({ onClose }: AddWorkspaceDialogProps)
       return
     }
 
-    const newWorkspace = new Workspace(newWorkspaceName, [])
+    const workspaceId = crypto.randomUUID()
+    const newWorkspace = new Workspace(workspaceId, newWorkspaceName, [])
     addWorkspace(newWorkspace)
     onClose()
   }
