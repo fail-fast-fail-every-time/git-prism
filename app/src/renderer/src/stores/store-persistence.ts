@@ -1,3 +1,4 @@
+import CustomCommand from '@/models/CustomCommand'
 import Repository from '@/models/Repository'
 import Settings from '@/models/Settings'
 import Workspace from '@/models/Workspace'
@@ -14,6 +15,7 @@ interface AppDataFile {
   recentBranches: Record<string, string[]>
   reposLastFetched: Date
   diffViewType?: 'unified' | 'split'
+  customCommands?: CustomCommand[]
   workspaces: {
     name: string
     selected: boolean
@@ -62,6 +64,7 @@ async function loadStoreFromFile(): Promise<Partial<StoreState>> {
     recentBranchesPerRepo: appData.recentBranches ?? {},
     reposLastFetched: appData.reposLastFetched,
     diffViewType: appData.diffViewType ?? 'unified',
+    customCommands: appData.customCommands ?? [],
     workspaces
   }
 }
@@ -73,6 +76,7 @@ function convertStoreStateToAppData(state: StoreState): AppDataFile {
     recentBranches: state.recentBranchesPerRepo,
     reposLastFetched: state.reposLastFetched,
     diffViewType: state.diffViewType,
+    customCommands: state.customCommands,
     workspaces: state.workspaces.map((workspace: Workspace) => {
       return {
         name: workspace.name,

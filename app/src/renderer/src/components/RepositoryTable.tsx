@@ -22,7 +22,7 @@ export default function RepositoryTable({ reposProcessing, onSelectRepo }: Repos
   const repositories = selectedWorkspace?.repositories.sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <Table className="bg-secondary/50 mt-0 rounded-lg">
+    <Table className="mt-0 rounded-lg">
       <TableHeader>
         <TableRow>
           <TableHead className="w-2">

@@ -1,4 +1,5 @@
 import { RepositoryCommand } from '@/components/WorkspaceView'
+import CustomCommand from '@/models/CustomCommand'
 import Repository from '@/models/Repository'
 import Settings from '@/models/Settings'
 import Workspace from '@/models/Workspace'
@@ -17,6 +18,7 @@ export interface StoreState {
   reposProcessing: string[]
   recentBranchesPerRepo: Record<string, string[]>
   diffViewType: 'split' | 'unified'
+  customCommands: CustomCommand[]
   initialize: () => void
   persist: () => void
   setSettings: (settings: Settings) => void
@@ -33,9 +35,17 @@ export interface StoreState {
   setSelectedWorkspace: (workspaceName: string) => void
   renameWorkspace: (oldName: string, newName: string) => void
   deleteWorkspace: (workspaceName: string) => void
-  runCommandOnRepositories: (command: RepositoryCommand, reposToRunOn?: Repository[], showSpinner?: boolean) => Promise<void>
+  runCommandOnRepositories: (
+    command: RepositoryCommand,
+    reposToRunOn?: Repository[],
+    showSpinner?: boolean,
+    clearLastError?: boolean
+  ) => Promise<void>
+  runCustomCommand: (command: CustomCommand) => void
   getSelectedWorkspace: () => Workspace | undefined
   setDiffViewType: (viewType: 'split' | 'unified') => void
+  saveCustomCommand: (commandName: string, command: CustomCommand) => void
+  removeCustomCommand: (commandName: string) => void
 }
 
 export const useStore = create<StoreState>()((set, get) => ({
@@ -49,6 +59,7 @@ export const useStore = create<StoreState>()((set, get) => ({
   reposProcessing: [],
   recentBranchesPerRepo: {},
   diffViewType: 'unified',
+  customCommands: [],
   setSettings: (settings: Settings): void => {
     set(() => ({
       settings: settings
@@ -166,10 +177,26 @@ export const useStore = create<StoreState>()((set, get) => ({
     }))
     get().persist()
   },
+  saveCustomCommand: (commandName: string, command: CustomCommand): void => {
+    set((state) => {
+      const existingCommands = state.customCommands.filter((c) => c.name !== commandName)
+      return {
+        customCommands: [...existingCommands, command]
+      }
+    })
+    get().persist()
+  },
+  removeCustomCommand: (commandName: string): void => {
+    set((state) => ({
+      customCommands: state.customCommands.filter((c) => c.name !== commandName)
+    }))
+    get().persist()
+  },
   runCommandOnRepositories: async (
     command: RepositoryCommand,
     reposToRunOn?: Repository[] | undefined,
-    showSpinner: boolean = true
+    showSpinner: boolean = true,
+    clearLastError: boolean = true
   ): Promise<void> => {
     const workspace = get().workspaces.find((w) => w.selected)
     if (!workspace) {
@@ -180,12 +207,15 @@ export const useStore = create<StoreState>()((set, get) => ({
     const repos = reposToRunOn ?? workspace.repositories.filter((r) => get().checkedRepos[r.path])
 
     //Clear all errors
-    repos.forEach((r) => (r.lastError = undefined))
+    if (clearLastError) {
+      repos.forEach((r) => (r.lastError = undefined))
+    }
 
     //List all repositories as processing
+    //If a repository is already processing it will be added twice, meaning the spinner will be shown until the last command is done
     if (showSpinner) {
-      set(() => ({
-        reposProcessing: repos.map((repo) => repo.path)
+      set((state) => ({
+        reposProcessing: [...state.reposProcessing, ...repos.map((repo) => repo.path)]
       }))
     }
 
@@ -194,19 +224,34 @@ export const useStore = create<StoreState>()((set, get) => ({
     const promises = repos.map((repo) =>
       limit(async () => {
         await command(repo)
-        //Remove this repository from processing after the command has been executed
-        set((state) => ({
-          reposProcessing: state.reposProcessing.filter((r) => r !== repo.path),
-          workspaces: state.workspaces.map((w) =>
-            w.name == workspace.name ? { ...w, repositories: w.repositories.map((r) => (r.path === repo.path ? repo : r)) } : w
-          ),
-          globalError: repos.length === 1 && repo.lastError ? repo.lastError : state.globalError
-        }))
+        //Remove first occurence of this repository from reposProcessing after the command has been executed
+        set((state) => {
+          const reposProcessing = [...state.reposProcessing]
+          reposProcessing.splice(reposProcessing.indexOf(repo.path), 1)
+          return {
+            reposProcessing: reposProcessing,
+            workspaces: state.workspaces.map((w) =>
+              w.name == workspace.name ? { ...w, repositories: w.repositories.map((r) => (r.path === repo.path ? repo : r)) } : w
+            ),
+            globalError: repos.length === 1 && repo.lastError ? repo.lastError : state.globalError
+          }
+        })
       })
     )
 
     //Await the commands has been executed on all repositories
     await Promise.all(promises)
+  },
+  runCustomCommand: (command: CustomCommand): void => {
+    get().runCommandOnRepositories(async (repo) => {
+      const commandText = command.commandPerRepo[repo.path]
+      if (commandText && commandText.trim().length > 0) {
+        const result = await window.api.io.exec(commandText, [], repo.path)
+        if (!result.success) {
+          repo.lastError = result.stderr.length > 0 ? result.stderr : result.stdout
+        }
+      }
+    })
   },
   getSelectedWorkspace: (): Workspace | undefined => {
     const workspace = get().workspaces.find((w) => w.selected)
@@ -253,7 +298,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       //Get new status on repositories on window is refocused
       window.electron.ipcRenderer.on('window-focused', async () => {
         console.log('Update repositories on window focus')
-        get().runCommandOnRepositories((repo) => repo.refresh(), get().getSelectedWorkspace()?.repositories, false)
+        get().runCommandOnRepositories((repo) => repo.refresh(), get().getSelectedWorkspace()?.repositories, false, false)
       })
     }
   }

@@ -102,7 +102,6 @@ export default class Repository {
     }
 
     try {
-      this.lastError = undefined
       const result = await command()
       return result
     } catch (e: any) {

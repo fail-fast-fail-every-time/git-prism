@@ -60,16 +60,18 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
                 ))}
               </CommandGroup>
             )}
-            <CommandGroup heading={recentBranches.length > 0 ? 'Other Branches' : 'Branches'}>
-              {allBranchesExceptRecentBranches.map((branch: string) => (
-                <BranchCommandItem
-                  key={branch}
-                  branch={branch}
-                  onSelect={() => handleSelectValue(branch)}
-                  selected={repo.branch === branch}
-                />
-              ))}
-            </CommandGroup>
+            {allBranchesExceptRecentBranches.length > 0 && (
+              <CommandGroup heading={recentBranches.length > 0 ? 'Other Branches' : 'Branches'}>
+                {allBranchesExceptRecentBranches.map((branch: string) => (
+                  <BranchCommandItem
+                    key={branch}
+                    branch={branch}
+                    onSelect={() => handleSelectValue(branch)}
+                    selected={repo.branch === branch}
+                  />
+                ))}
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>
@@ -91,7 +93,7 @@ function BranchCommandItem({
       {selected && <Check className="mr-2 w-4 h-4" />}
       {!selected && <GitBranchIcon className="mr-2 w-4 h-4" />}
       <div className="flex-1">{branch}</div>
-      <Tooltip>
+      <Tooltip delayDuration={500}>
         <TooltipTrigger>
           <CopyButton text={branch} className="opacity-0 group-hover:opacity-100 pr-0 h-6" />
         </TooltipTrigger>
