@@ -25,7 +25,7 @@ export default function RepositoryTable({ reposProcessing, onSelectRepo }: Repos
     <Table className="mt-0 rounded-lg">
       <TableHeader>
         <TableRow>
-          <TableHead className="w-2">
+          <TableHead className="w-[5%]">
             <label className="p-2 cursor-pointer">
               <Checkbox
                 checked={Object.values(checkedRepos).every((value) => value === true)}
@@ -33,13 +33,13 @@ export default function RepositoryTable({ reposProcessing, onSelectRepo }: Repos
               />
             </label>
           </TableHead>
-          <TableHead>Repository</TableHead>
-          <TableHead>Branch</TableHead>
-          <TableHead>Latest Commit</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-center text-nowrap">Behind | Ahead</TableHead>
-          <TableHead></TableHead>
-          <TableHead></TableHead>
+          <TableHead className="w-[20%]">Repository</TableHead>
+          <TableHead className="w-[25%]">Branch</TableHead>
+          <TableHead className="w-[15%]">Latest Commit</TableHead>
+          <TableHead className="w-[10%]">Status</TableHead>
+          <TableHead className="w-[10%] text-center text-nowrap">Behind | Ahead</TableHead>
+          <TableHead className="w-[5%]"></TableHead>
+          <TableHead className="w-[5%]"></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

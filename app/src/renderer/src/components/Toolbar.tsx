@@ -39,8 +39,7 @@ export default function Toolbar(): ReactElement {
   const customCommandsPinnedToToolbar = customCommands
     .filter(
       (cmd) =>
-        cmd.pinSetting === PinSetting.AllWorkspaces ||
-        (cmd.pinSetting === PinSetting.Workspace && workspace?.id == cmd.pinToWorkspaceId)
+        cmd.pinSetting === PinSetting.AllWorkspaces || (cmd.pinSetting === PinSetting.Workspace && workspace?.id == cmd.pinToWorkspaceId)
     )
     .map((cmd) => ({
       text: cmd.name,

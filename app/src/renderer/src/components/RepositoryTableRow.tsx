@@ -106,12 +106,8 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
                 />
               </label>
             </TableCell>
-            <TableCell onClick={onClick} className="w-[25%]">
-              {repository.name}
-            </TableCell>
-            <TableCell onClick={onClick}>
-              <div className="flex flex-wrap items-center">{repository.branch && <BranchSelector repo={repository} />}</div>
-            </TableCell>
+            <TableCell onClick={onClick}>{repository.name}</TableCell>
+            <TableCell onClick={onClick}>{repository.branch && <BranchSelector repo={repository} />}</TableCell>
             <TableCell onClick={onClick}>{latestCommit(repository, settings.hourFormat)}</TableCell>
             <TableCell onClick={onClick}>{status(repository)}</TableCell>
             <TableCell onClick={onClick}>
@@ -179,7 +175,7 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
       {showCreateBranch && <CreateBranchDialog repository={repository} onClose={() => setShowCreateBranch(false)} />}
       {showMergeBranch && <MergeBranchDialog repository={repository} onClose={() => setShowMergeBranch(false)} />}
       {showMergeInto && <MergeIntoDialog repository={repository} onClose={() => setShowMergeInto(false)} />}
-      {showRunCommand && <RunCommandDialog repository={repository} onClose={() => setShowRunCommand(false)} />}
+      {showRunCommand && <RunCommandDialog onClose={() => setShowRunCommand(false)} />}
       {showRebase && <RebaseDialog repository={repository} onClose={() => setShowRebase(false)} />}
     </>
   )
