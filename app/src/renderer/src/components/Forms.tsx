@@ -1,14 +1,15 @@
 import { Label } from '@/components/shadcn/Label'
-import { ReactElement } from 'react'
+import clsx from 'clsx'
+import { HTMLAttributes, ReactElement } from 'react'
 
-interface FormLabelProps {
+type FormLabelProps = {
   children: string
-  htmlFor: string
-}
+  htmlFor?: string
+} & HTMLAttributes<HTMLLabelElement>
 
-export function FormLabel({ htmlFor, children }: FormLabelProps): ReactElement {
+export function FormLabel({ htmlFor, children, className, ...props }: FormLabelProps): ReactElement {
   return (
-    <Label className="block font-semibold" htmlFor={htmlFor}>
+    <Label className={clsx('block font-semibold', className)} htmlFor={htmlFor} {...props}>
       {children}
     </Label>
   )

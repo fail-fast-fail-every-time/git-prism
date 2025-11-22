@@ -96,6 +96,15 @@ body,
   -webkit-app-region: no-drag;
 }
 
+.multiselect span,
+.multiselect div div div:last-of-type {
+  font-weight: normal !important;
+}
+
+.multiselect div[role="button"] {
+  padding: 0px !important;
+}
+
 .toolbar-button {
   position: relative;
 }
@@ -153,4 +162,8 @@ body {
 * {
   outline: none !important;
   box-shadow: none !important;
+}
+
+.dialog-medium {
+  max-width: 700px;
 }

@@ -39,7 +39,7 @@ export default function BranchSelector({ repo }: BranchSelectorProps): ReactElem
       <PopoverTrigger asChild>
         <Button variant="ghost" role="combobox" aria-expanded={open} className="justify-start px-2" onClick={(e) => e.stopPropagation()}>
           <GitBranch size={14} className="inline-block" />
-          <div className="h-[20px] overflow-y-hidden whitespace-break-spaces">{repo.branch}</div>
+          <div className="h-[20px] overflow-y-hidden text-left whitespace-break-spaces">{repo.branch}</div>
           <ChevronDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
