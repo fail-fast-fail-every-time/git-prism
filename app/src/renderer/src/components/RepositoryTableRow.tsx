@@ -15,6 +15,7 @@ import {
   GitMerge,
   GitPullRequestArrow,
   GitPullRequestCreate,
+  Package,
   RotateCw,
   Terminal,
   Upload
@@ -29,7 +30,6 @@ import MergeIntoDialog from './dialogs/MergeIntoDialog'
 import RebaseDialog from './dialogs/RebaseDialog'
 import SwitchBranchDialog from './dialogs/SwitchBranchDialog'
 import RepositoryTableError from './RepositoryTableError'
-import { Checkbox } from './shadcn/checkbox'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from './shadcn/context-menu'
 import Spinner from './Spinner'
 
@@ -40,11 +40,9 @@ interface RepositoryTableRowProps {
 }
 
 export default function RepositoryTableRow({ repository, processing, onClick }: RepositoryTableRowProps): ReactElement {
-  const checkedRepos = useStore((store) => store.checkedRepos)
   const setGlobalError = useStore((store) => store.setGlobalError)
   const removeRepositoryFromSelectedWorkspace = useStore((store) => store.removeRepositoryFromSelectedWorkspace)
   const settings = useStore((store) => store.settings)
-  const setCheckedRepos = useStore((store) => store.setCheckedRepos)
   const [showSwitchBranch, setShowSwitchBranch] = useState<boolean>(false)
   const [showCreateBranch, setShowCreateBranch] = useState<boolean>(false)
   const [showMergeBranch, setShowMergeBranch] = useState<boolean>(false)
@@ -52,10 +50,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
   const [showRebase, setShowRebase] = useState<boolean>(false)
   const [showRunCommand, setShowRunCommand] = useState<boolean>(false)
   const runCommand = useStore((store) => store.runCommandOnRepositories)
-
-  const toggleRepo = (repoPath: string): void => {
-    setCheckedRepos({ ...checkedRepos, [repoPath]: !checkedRepos[repoPath] })
-  }
 
   //Trigger the context menu when left clicking on the meatball by manually emitting a mouseevent as if the user right clicked
   const showContextMenuOnLeftClick = (event): void => {
@@ -96,17 +90,12 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <TableRow className="repo-table cursor-pointer">
-            <TableCell>
-              <label className="p-2">
-                <Checkbox
-                  disabled={repository.disabled}
-                  checked={checkedRepos[repository.path]}
-                  onCheckedChange={() => toggleRepo(repository.path)}
-                  className="mt-1"
-                />
-              </label>
+            <TableCell onClick={onClick}>
+              <div className="flex items-center gap-2">
+                <Package size={16} />
+                {repository.name}
+              </div>
             </TableCell>
-            <TableCell onClick={onClick}>{repository.name}</TableCell>
             <TableCell onClick={onClick}>{repository.branch && <BranchSelector repo={repository} />}</TableCell>
             <TableCell onClick={onClick}>{latestCommit(repository, settings.hourFormat)}</TableCell>
             <TableCell onClick={onClick}>{status(repository)}</TableCell>

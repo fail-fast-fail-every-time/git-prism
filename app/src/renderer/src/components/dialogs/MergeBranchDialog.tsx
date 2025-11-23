@@ -1,11 +1,12 @@
 import { FormLabel } from '@/components/Forms'
 import RepositorySelector from '@/components/RepositorySelector'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shadcn/Dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/Dialog'
 import Repository from '@/models/Repository'
 import useStore, { useSelectedWorkspace } from '@/stores/store'
 import { ReactElement, useMemo, useState } from 'react'
 import { getLocalBranchesFromRepositoryList as getBranchesFromRepositoryList } from '../../Util'
 import { BranchList } from '../BranchList'
+import { Button } from '../shadcn/Button'
 
 interface MergeBranchDialogProps {
   onClose: () => void
@@ -39,13 +40,24 @@ export default function MergeBranchDialog({ onClose, repository }: MergeBranchDi
           <DialogTitle>Merge branch</DialogTitle>
           <DialogDescription>Merge a branch into selected repositories</DialogDescription>
         </DialogHeader>
-        <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={handleSelectBranch} />
-        <FormLabel className="mt-3">Repositories</FormLabel>
+        <FormLabel>Repositories</FormLabel>
         <RepositorySelector
           options={workspace?.repositories ?? []}
           defaultValues={defaultSelectedRepos}
           onValueChange={setSelectedRepositories}
         />
+        <div>
+          <FormLabel className="mt-2">Branch</FormLabel>
+          <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={handleSelectBranch} />
+        </div>
+        <DialogFooter>
+          <Button variant={'outline'} type="submit" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" onClick={onClose}>
+            Merge
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

@@ -1,9 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/Table'
 import Repository from '@/models/Repository'
-import useStore, { useSelectedWorkspace } from '@/stores/store'
+import { useSelectedWorkspace } from '@/stores/store'
 import { ReactElement } from 'react'
 import RepositoryTableRow from './RepositoryTableRow'
-import { Checkbox } from './shadcn/checkbox'
 
 interface RepositoryTableProps {
   reposProcessing: string[]
@@ -11,13 +10,6 @@ interface RepositoryTableProps {
 }
 
 export default function RepositoryTable({ reposProcessing, onSelectRepo }: RepositoryTableProps): ReactElement {
-  const checkedRepos = useStore((store) => store.checkedRepos)
-  const setCheckedRepos = useStore((store) => store.setCheckedRepos)
-
-  const toggleAll = (value: boolean): void => {
-    setCheckedRepos(Object.fromEntries(Object.keys(checkedRepos).map((key) => [key, value])))
-  }
-
   const selectedWorkspace = useSelectedWorkspace()
   const repositories = selectedWorkspace?.repositories.sort((a, b) => a.name.localeCompare(b.name))
 
@@ -25,14 +17,6 @@ export default function RepositoryTable({ reposProcessing, onSelectRepo }: Repos
     <Table className="mt-0 rounded-lg">
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[5%]">
-            <label className="p-2 cursor-pointer">
-              <Checkbox
-                checked={Object.values(checkedRepos).every((value) => value === true)}
-                onCheckedChange={(checked: boolean) => toggleAll(checked)}
-              />
-            </label>
-          </TableHead>
           <TableHead className="w-[20%]">Repository</TableHead>
           <TableHead className="w-[25%]">Branch</TableHead>
           <TableHead className="w-[15%]">Latest Commit</TableHead>
