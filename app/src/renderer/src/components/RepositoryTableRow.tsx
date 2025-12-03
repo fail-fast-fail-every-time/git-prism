@@ -17,13 +17,11 @@ import {
   GitPullRequestCreate,
   Package,
   RotateCw,
-  Terminal,
   Upload
 } from 'lucide-react'
 import { ReactElement, useState } from 'react'
 import { BehindAhead } from './BehindAhead'
 import BranchSelector from './BranchSelector'
-import RunCommandDialog from './dialogs/commands/CommandListDialog'
 import CreateBranchDialog from './dialogs/CreateBranchDialog'
 import MergeBranchDialog from './dialogs/MergeBranchDialog'
 import MergeIntoDialog from './dialogs/MergeIntoDialog'
@@ -48,7 +46,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
   const [showMergeBranch, setShowMergeBranch] = useState<boolean>(false)
   const [showMergeInto, setShowMergeInto] = useState<boolean>(false)
   const [showRebase, setShowRebase] = useState<boolean>(false)
-  const [showRunCommand, setShowRunCommand] = useState<boolean>(false)
   const runCommand = useStore((store) => store.runCommandOnRepositories)
 
   //Trigger the context menu when left clicking on the meatball by manually emitting a mouseevent as if the user right clicked
@@ -141,9 +138,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
           <ContextMenuItem onClick={() => runCommand((r) => r.refresh(), [repository])}>
             <RotateCw size={16} className="mr-2" /> Refresh
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => setShowRunCommand(true)}>
-            <Terminal size={16} className="mr-2" /> Run command...
-          </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem onClick={() => window.api.io.openFileExplorer(repository.path)}>
             <Folder size={16} className="mr-2" /> Open in file explorer
@@ -164,7 +158,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
       {showCreateBranch && <CreateBranchDialog repository={repository} onClose={() => setShowCreateBranch(false)} />}
       {showMergeBranch && <MergeBranchDialog repository={repository} onClose={() => setShowMergeBranch(false)} />}
       {showMergeInto && <MergeIntoDialog repository={repository} onClose={() => setShowMergeInto(false)} />}
-      {showRunCommand && <RunCommandDialog onClose={() => setShowRunCommand(false)} />}
       {showRebase && <RebaseDialog repository={repository} onClose={() => setShowRebase(false)} />}
     </>
   )
