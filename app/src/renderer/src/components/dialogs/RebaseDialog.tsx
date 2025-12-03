@@ -5,6 +5,7 @@ import useStore, { useSelectedWorkspace } from '@/stores/store'
 import { ReactElement, useMemo, useState } from 'react'
 import { getLocalBranchesFromRepositoryList as getBranchesFromRepositoryList } from '../../Util'
 import { BranchList } from '../BranchList'
+import ConfirmDialog from '../ConfirmDialog'
 import { FormLabel } from '../Forms'
 
 interface RebaseDialogProps {
@@ -19,6 +20,7 @@ export default function RebaseDialog({ onClose, repository }: RebaseDialogProps)
   const defaultSelectedRepos = repository ? [repository] : (workspace?.repositories ?? [])
   const [selectedRepositories, setSelectedRepositories] = useState<Repository[]>(defaultSelectedRepos)
   const branches = useMemo(() => getBranchesFromRepositoryList(selectedRepositories, true), [selectedRepositories])
+  const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
 
   if (!workspace) {
     return <></>
@@ -42,13 +44,24 @@ export default function RebaseDialog({ onClose, repository }: RebaseDialogProps)
             Rebase {repository ? <b>{repository.name}</b> : `${selectedRepositories.length} selected repositories`}
           </DialogDescription>
         </DialogHeader>
-        <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={handleRebase} />
+        <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={setSelectedBranch} />
         <FormLabel className="mt-3">Repositories</FormLabel>
         <RepositorySelector
           options={workspace?.repositories ?? []}
           defaultValues={defaultSelectedRepos}
           onValueChange={setSelectedRepositories}
         />
+        {selectedBranch && (
+          <ConfirmDialog
+            title="Confirm rebase"
+            text={`Are you sure you want to rebase <b>${selectedBranch}</b> onto the current branch on ${selectedRepositories.length == 1 ? `<b>${selectedRepositories[0].name}</b>` : `<b>${selectedRepositories.length} repositories</b>`}?`}
+            onCancel={() => setSelectedBranch(null)}
+            onConfirm={() => {
+              handleRebase(selectedBranch)
+              setSelectedBranch(null)
+            }}
+          />
+        )}
       </DialogContent>
     </Dialog>
   )

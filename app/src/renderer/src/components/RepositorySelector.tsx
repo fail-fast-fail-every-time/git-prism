@@ -28,6 +28,13 @@ export default function RepositorySelector({
   const def = defaultValues ? defaultValues.map((d) => d.path) : []
 
   return (
-    <MultiSelect options={selectOptions} defaultValue={def} onValueChange={handleValueChange} maxCount={maxCount} className="multiselect" />
+    <MultiSelect
+      options={selectOptions}
+      placeholder="Select repositories"
+      defaultValue={def}
+      onValueChange={handleValueChange}
+      maxCount={maxCount}
+      className="multiselect"
+    />
   )
 }

@@ -92,7 +92,7 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
           <TableRow className="repo-table cursor-pointer">
             <TableCell onClick={onClick}>
               <div className="flex items-center gap-2">
-                <Package size={16} />
+                <Package size={18} />
                 {repository.name}
               </div>
             </TableCell>
