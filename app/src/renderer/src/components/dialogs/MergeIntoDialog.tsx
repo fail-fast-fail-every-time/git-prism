@@ -4,6 +4,7 @@ import useStore, { useSelectedWorkspace } from '@/stores/store'
 import { ReactElement, useMemo, useState } from 'react'
 import { getLocalBranchesFromRepositoryList as getBranchesFromRepositoryList } from '../../Util'
 import { BranchList } from '../BranchList'
+import ConfirmDialog from '../ConfirmDialog'
 import Spinner from '../Spinner'
 
 interface MergeIntoDialogProps {
@@ -13,12 +14,13 @@ interface MergeIntoDialogProps {
 
 export default function MergeIntoDialog({ onClose, repository }: MergeIntoDialogProps): ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const selectedWorkspace = useSelectedWorkspace()
+  const workspace = useSelectedWorkspace()
   const runCommand = useStore((store) => store.runCommandOnRepositories)
+  const recentBranches = repository ? useStore((store) => store.recentBranchesPerRepo[repository.path]) : undefined
   const branches = useMemo(() => getBranchesFromRepositoryList([repository], false), [repository])
-  const recentBranches = useStore((store) => store.recentBranchesPerRepo[repository.path])
+  const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
 
-  if (!selectedWorkspace || !repository.branch) {
+  if (!workspace || !repository.branch) {
     return <></>
   }
 
@@ -48,7 +50,15 @@ export default function MergeIntoDialog({ onClose, repository }: MergeIntoDialog
           </DialogDescription>
         </DialogHeader>
         {isLoading && <Spinner />}
-        {!isLoading && <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={handleSelectBranch} />}
+        {!isLoading && <BranchList branches={branches} recentBranches={recentBranches} onSelectBranch={setSelectedBranch} />}
+        {!isLoading && selectedBranch && (
+          <ConfirmDialog
+            title="Confirm merge"
+            text={`Are you sure you want to merge branch <b>${repository.branch}</b> into <b>${selectedBranch}</b> on <b>${repository.name}</b>?`}
+            onCancel={() => setSelectedBranch(null)}
+            onConfirm={() => handleSelectBranch(selectedBranch)}
+          />
+        )}
       </DialogContent>
     </Dialog>
   )

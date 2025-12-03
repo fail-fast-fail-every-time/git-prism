@@ -12,7 +12,6 @@ export interface StoreState {
   settings: Settings
   workspaces: Workspace[]
   globalError: string | undefined
-  checkedRepos: Record<string, boolean>
   recentCommands: string[]
   reposLastFetched: Date
   reposProcessing: string[]
@@ -25,7 +24,6 @@ export interface StoreState {
   setReposLastFetched: (date: Date) => void
   addRecentCommand: (command: string) => void
   removeRecentCommand: (command: string) => void
-  setCheckedRepos: (checkedRepos: Record<string, boolean>) => void
   addRepositories: (workspace: Workspace, repos: Repository[]) => void
   addRecentBranch: (repoPath: string, branch: string) => void
   updateRepository: (workspace: Workspace, repos: Repository) => void
@@ -53,7 +51,6 @@ export const useStore = create<StoreState>()((set, get) => ({
   settings: new Settings(),
   workspaces: [new Workspace('-1', 'Default workspace', [], true)],
   globalError: undefined,
-  checkedRepos: {},
   recentCommands: [],
   reposLastFetched: new Date(),
   reposProcessing: [],
@@ -93,11 +90,6 @@ export const useStore = create<StoreState>()((set, get) => ({
     }))
     get().persist()
   },
-  setCheckedRepos: (checkedRepos: Record<string, boolean>): void => {
-    set(() => ({
-      checkedRepos: checkedRepos
-    }))
-  },
   addRecentBranch: (repoPath: string, branch: string): void => {
     branch = branch.replace('remotes/origin/', '').replace('origin/', '')
     set((state) => {
@@ -119,8 +111,7 @@ export const useStore = create<StoreState>()((set, get) => ({
     }
 
     set((state) => ({
-      workspaces: state.workspaces.map((w) => ({ ...w, selected: w.name == workspaceName })),
-      checkedRepos: Object.fromEntries(selectedWorkspace.repositories.map((r) => [r.path, true]))
+      workspaces: state.workspaces.map((w) => ({ ...w, selected: w.name == workspaceName }))
     }))
     get().persist()
     get().runCommandOnRepositories((repo) => repo.refresh(), selectedWorkspace?.repositories)
@@ -151,11 +142,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       const existingRepos = new Set(workspace.repositories.map((r) => r.path))
       const newRepos = repos.filter((r) => !existingRepos.has(r.path))
       return {
-        workspaces: state.workspaces.map((w) => (w.name == workspace.name ? { ...w, repositories: [...w.repositories, ...newRepos] } : w)),
-        checkedRepos: {
-          ...state.checkedRepos,
-          ...Object.fromEntries(newRepos.map((r) => [r.path, true]))
-        }
+        workspaces: state.workspaces.map((w) => (w.name == workspace.name ? { ...w, repositories: [...w.repositories, ...newRepos] } : w))
       }
     })
     get().runCommandOnRepositories((repo) => repo.refresh(), repos)
@@ -203,8 +190,8 @@ export const useStore = create<StoreState>()((set, get) => ({
       console.log('not found')
       return
     }
-    //If the list of repositories to run the command on is not provided, run on all checked repositories
-    const repos = reposToRunOn ?? workspace.repositories.filter((r) => get().checkedRepos[r.path])
+    //If the list of repositories to run the command on is not provided, run on all repositories
+    const repos = reposToRunOn ?? workspace.repositories
 
     //Clear all errors
     if (clearLastError) {
@@ -307,12 +294,6 @@ export const useStore = create<StoreState>()((set, get) => ({
 export function useSelectedWorkspace(): Workspace | undefined {
   const workspaces = useStore((s) => s.workspaces)
   return workspaces.find((w) => w.selected)
-}
-
-export function useCheckedRepos(): Repository[] {
-  const selectedWorkspace = useSelectedWorkspace()
-  const checkedRepos = useStore((s) => s.checkedRepos)
-  return selectedWorkspace?.repositories.filter((r) => checkedRepos[r.path]) ?? []
 }
 
 export default useStore

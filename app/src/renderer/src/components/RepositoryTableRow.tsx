@@ -15,21 +15,19 @@ import {
   GitMerge,
   GitPullRequestArrow,
   GitPullRequestCreate,
+  Package,
   RotateCw,
-  Terminal,
   Upload
 } from 'lucide-react'
 import { ReactElement, useState } from 'react'
 import { BehindAhead } from './BehindAhead'
 import BranchSelector from './BranchSelector'
-import RunCommandDialog from './dialogs/commands/CommandListDialog'
 import CreateBranchDialog from './dialogs/CreateBranchDialog'
 import MergeBranchDialog from './dialogs/MergeBranchDialog'
 import MergeIntoDialog from './dialogs/MergeIntoDialog'
 import RebaseDialog from './dialogs/RebaseDialog'
 import SwitchBranchDialog from './dialogs/SwitchBranchDialog'
 import RepositoryTableError from './RepositoryTableError'
-import { Checkbox } from './shadcn/checkbox'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from './shadcn/context-menu'
 import Spinner from './Spinner'
 
@@ -40,22 +38,15 @@ interface RepositoryTableRowProps {
 }
 
 export default function RepositoryTableRow({ repository, processing, onClick }: RepositoryTableRowProps): ReactElement {
-  const checkedRepos = useStore((store) => store.checkedRepos)
   const setGlobalError = useStore((store) => store.setGlobalError)
   const removeRepositoryFromSelectedWorkspace = useStore((store) => store.removeRepositoryFromSelectedWorkspace)
   const settings = useStore((store) => store.settings)
-  const setCheckedRepos = useStore((store) => store.setCheckedRepos)
   const [showSwitchBranch, setShowSwitchBranch] = useState<boolean>(false)
   const [showCreateBranch, setShowCreateBranch] = useState<boolean>(false)
   const [showMergeBranch, setShowMergeBranch] = useState<boolean>(false)
   const [showMergeInto, setShowMergeInto] = useState<boolean>(false)
   const [showRebase, setShowRebase] = useState<boolean>(false)
-  const [showRunCommand, setShowRunCommand] = useState<boolean>(false)
   const runCommand = useStore((store) => store.runCommandOnRepositories)
-
-  const toggleRepo = (repoPath: string): void => {
-    setCheckedRepos({ ...checkedRepos, [repoPath]: !checkedRepos[repoPath] })
-  }
 
   //Trigger the context menu when left clicking on the meatball by manually emitting a mouseevent as if the user right clicked
   const showContextMenuOnLeftClick = (event): void => {
@@ -96,17 +87,12 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <TableRow className="repo-table cursor-pointer">
-            <TableCell>
-              <label className="p-2">
-                <Checkbox
-                  disabled={repository.disabled}
-                  checked={checkedRepos[repository.path]}
-                  onCheckedChange={() => toggleRepo(repository.path)}
-                  className="mt-1"
-                />
-              </label>
+            <TableCell onClick={onClick}>
+              <div className="flex items-center gap-2">
+                <Package size={18} />
+                {repository.name}
+              </div>
             </TableCell>
-            <TableCell onClick={onClick}>{repository.name}</TableCell>
             <TableCell onClick={onClick}>{repository.branch && <BranchSelector repo={repository} />}</TableCell>
             <TableCell onClick={onClick}>{latestCommit(repository, settings.hourFormat)}</TableCell>
             <TableCell onClick={onClick}>{status(repository)}</TableCell>
@@ -152,9 +138,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
           <ContextMenuItem onClick={() => runCommand((r) => r.refresh(), [repository])}>
             <RotateCw size={16} className="mr-2" /> Refresh
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => setShowRunCommand(true)}>
-            <Terminal size={16} className="mr-2" /> Run command...
-          </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem onClick={() => window.api.io.openFileExplorer(repository.path)}>
             <Folder size={16} className="mr-2" /> Open in file explorer
@@ -175,7 +158,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
       {showCreateBranch && <CreateBranchDialog repository={repository} onClose={() => setShowCreateBranch(false)} />}
       {showMergeBranch && <MergeBranchDialog repository={repository} onClose={() => setShowMergeBranch(false)} />}
       {showMergeInto && <MergeIntoDialog repository={repository} onClose={() => setShowMergeInto(false)} />}
-      {showRunCommand && <RunCommandDialog onClose={() => setShowRunCommand(false)} />}
       {showRebase && <RebaseDialog repository={repository} onClose={() => setShowRebase(false)} />}
     </>
   )

@@ -14,7 +14,7 @@ export function BranchList({ branches, onSelectBranch, recentBranches }: BranchL
   const remoteBranches = branches.filter((b) => b.startsWith('origin/'))
 
   return (
-    <div className="flex flex-col gap-2 h-[400px] overflow-y-auto">
+    <div className="flex flex-col gap-2 h-[300px] overflow-y-auto">
       <Command>
         <CommandInput placeholder="Search branch..." />
         <CommandList>
