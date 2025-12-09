@@ -8,8 +8,8 @@ import {
 } from "lucide-react"
 import * as React from "react"
 
-import { Badge } from "@/components/shadcn/badge"
-import { Button } from "@/components/shadcn/button"
+import { Badge } from "@/components/shadcn/Badge"
+import { Button } from "@/components/shadcn/Button"
 import {
   Command,
   CommandEmpty,

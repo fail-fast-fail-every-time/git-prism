@@ -15,21 +15,20 @@ interface MergeBranchDialogProps {
 
 export default function MergeBranchDialog({ onClose, repository }: MergeBranchDialogProps): ReactElement {
   const workspace = useSelectedWorkspace()
+  const recentBranchesPerRepo = useStore((store) => store.recentBranchesPerRepo)
   const runCommand = useStore((store) => store.runCommandOnRepositories)
-  const recentBranches = repository ? useStore((store) => store.recentBranchesPerRepo[repository.path]) : undefined
   const defaultSelectedRepos = repository ? [repository] : (workspace?.repositories ?? [])
   const [selectedRepositories, setSelectedRepositories] = useState<Repository[]>(defaultSelectedRepos)
   const branches = useMemo(() => getBranchesFromRepositoryList(selectedRepositories, false), [selectedRepositories])
+  const recentBranches = selectedRepositories.length === 1 ? recentBranchesPerRepo[selectedRepositories[0].path] : undefined
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
 
-  if (!workspace) {
-    return <></>
-  }
-
-  const handleSelectBranch = (selectedBranch: string): void => {
-    const reposToApplyMerge = repository
-      ? [repository]
-      : selectedRepositories.filter((repo) => repo.branches?.find((b) => b.name == selectedBranch) !== undefined)
+  //Do the actual merge when clicking on submit
+  const handleMerge = (): void => {
+    if (!selectedBranch) {
+      return
+    }
+    const reposToApplyMerge = selectedRepositories.filter((repo) => repo.branches?.find((b) => b.name == selectedBranch) !== undefined)
     runCommand((r) => r.merge(selectedBranch), reposToApplyMerge)
     onClose()
   }
@@ -51,12 +50,19 @@ export default function MergeBranchDialog({ onClose, repository }: MergeBranchDi
         {selectedBranch && (
           <ConfirmDialog
             title="Confirm merge"
-            text={`Are you sure you want to merge branch <b>${selectedBranch}</b> into ${selectedRepositories.length == 1 ? `<b>${selectedRepositories[0].name}</b>` : `<b>${selectedRepositories.length} repositories</b>`}?`}
+            text={getMergeText(selectedBranch, selectedRepositories)}
+            onConfirm={() => handleMerge()}
             onCancel={() => setSelectedBranch(null)}
-            onConfirm={() => handleSelectBranch(selectedBranch)}
           />
         )}
       </DialogContent>
     </Dialog>
   )
+}
+
+function getMergeText(selectedBranch: string, selectedRepositories: Repository[]): string {
+  return `${selectedRepositories.length == 1
+    ? `Merge <b>${selectedBranch}</b> into <b>${selectedRepositories[0].branch}</b> on <b>${selectedRepositories[0].name}</b>?`
+    : `Merge <b>${selectedBranch}</b> into <b>${selectedRepositories.length} repositories</b>?`
+    }`
 }

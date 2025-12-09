@@ -24,7 +24,6 @@ import { BehindAhead } from './BehindAhead'
 import BranchSelector from './BranchSelector'
 import CreateBranchDialog from './dialogs/CreateBranchDialog'
 import MergeBranchDialog from './dialogs/MergeBranchDialog'
-import MergeIntoDialog from './dialogs/MergeIntoDialog'
 import RebaseDialog from './dialogs/RebaseDialog'
 import SwitchBranchDialog from './dialogs/SwitchBranchDialog'
 import RepositoryTableError from './RepositoryTableError'
@@ -44,7 +43,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
   const [showSwitchBranch, setShowSwitchBranch] = useState<boolean>(false)
   const [showCreateBranch, setShowCreateBranch] = useState<boolean>(false)
   const [showMergeBranch, setShowMergeBranch] = useState<boolean>(false)
-  const [showMergeInto, setShowMergeInto] = useState<boolean>(false)
   const [showRebase, setShowRebase] = useState<boolean>(false)
   const runCommand = useStore((store) => store.runCommandOnRepositories)
 
@@ -126,10 +124,7 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
             <GitPullRequestCreate size={16} className="mr-2" /> New branch...
           </ContextMenuItem>
           <ContextMenuItem onClick={() => setShowMergeBranch(true)}>
-            <GitPullRequestArrow size={16} className="mr-2" /> Merge another branch into this...
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => setShowMergeInto(true)}>
-            <GitPullRequestArrow size={16} className="mr-2" /> Merge this branch into another...
+            <GitPullRequestArrow size={16} className="mr-2" /> Merge branch...
           </ContextMenuItem>
           <ContextMenuItem onClick={() => setShowRebase(true)}>
             <GitGraph size={16} className="mr-2" /> Rebase...
@@ -157,7 +152,6 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
       {showSwitchBranch && <SwitchBranchDialog repository={repository} onClose={() => setShowSwitchBranch(false)} />}
       {showCreateBranch && <CreateBranchDialog repository={repository} onClose={() => setShowCreateBranch(false)} />}
       {showMergeBranch && <MergeBranchDialog repository={repository} onClose={() => setShowMergeBranch(false)} />}
-      {showMergeInto && <MergeIntoDialog repository={repository} onClose={() => setShowMergeInto(false)} />}
       {showRebase && <RebaseDialog repository={repository} onClose={() => setShowRebase(false)} />}
     </>
   )
