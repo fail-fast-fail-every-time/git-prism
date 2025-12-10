@@ -87,8 +87,10 @@ export default function RepositoryTableRow({ repository, processing, onClick }: 
           <TableRow className="repo-table cursor-pointer">
             <TableCell onClick={onClick}>
               <div className="flex items-center gap-2">
-                <Package size={18} />
-                {repository.name}
+                <div>
+                  <Package size={18} />
+                </div>
+                <div>{repository.name}</div>
               </div>
             </TableCell>
             <TableCell onClick={onClick}>{repository.branch && <BranchSelector repo={repository} />}</TableCell>
