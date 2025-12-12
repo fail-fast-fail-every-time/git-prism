@@ -50,7 +50,7 @@ export default function MergeBranchDialog({ onClose, repository }: MergeBranchDi
         {selectedBranch && (
           <ConfirmDialog
             title="Confirm merge"
-            text={getMergeText(selectedBranch, selectedRepositories)}
+            text={getMergeConfirmText(selectedBranch, selectedRepositories)}
             onConfirm={() => handleMerge()}
             onCancel={() => setSelectedBranch(null)}
           />
@@ -60,9 +60,15 @@ export default function MergeBranchDialog({ onClose, repository }: MergeBranchDi
   )
 }
 
-function getMergeText(selectedBranch: string, selectedRepositories: Repository[]): string {
-  return `${selectedRepositories.length == 1
-    ? `Merge <b>${selectedBranch}</b> into <b>${selectedRepositories[0].branch}</b> on <b>${selectedRepositories[0].name}</b>?`
-    : `Merge <b>${selectedBranch}</b> into <b>${selectedRepositories.length} repositories</b>?`
-    }`
+function getMergeConfirmText(selectedBranch: string, selectedRepositories: Repository[]): string {
+  if (selectedRepositories.length === 1) {
+    return `Merge <b>${selectedBranch}</b> into <b>${selectedRepositories[0].branch}</b> on <b>${selectedRepositories[0].name}</b>?`
+  } else {
+    const branches = [...new Set(selectedRepositories.map((repo) => repo.branch))]
+    if (branches.length === 1) {
+      return `Merge <b>${selectedBranch}</b> into <b>${branches[0]}</b> on <b>${selectedRepositories.length} repositories</b>?`
+    } else {
+      return `Merge <b>${selectedBranch}</b> into <b>${selectedRepositories.length} repositories</b>?`
+    }
+  }
 }
