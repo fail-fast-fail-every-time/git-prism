@@ -23,6 +23,8 @@ async function executeFetchIfIntervalExceeded(): Promise<void> {
     return
   }
 
+  setReposLastFetched(new Date())
+
   let repositories = workspaces.flatMap((w) => w.repositories)
   repositories = distinctBy(repositories, (repo: Repository) => repo.path)
 
@@ -33,8 +35,6 @@ async function executeFetchIfIntervalExceeded(): Promise<void> {
     })
   )
   await Promise.all(promises)
-
-  setReposLastFetched(new Date())
 }
 
 function shouldFetch(): boolean {
