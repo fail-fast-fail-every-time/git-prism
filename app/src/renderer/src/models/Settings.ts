@@ -12,6 +12,7 @@ export default class Settings {
   public externalGitClientCustomCommand: string | undefined
   public hourFormat: HourFormat = HourFormat.Hour24
   public externalEditors: ExternalEditor[] = []
+  public autoUpdateEnabled: boolean = true
 
   public constructor(init?: Partial<Settings>) {
     Object.assign(this, init)

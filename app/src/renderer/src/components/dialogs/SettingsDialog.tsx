@@ -124,6 +124,16 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps): ReactE
       )
     },
     {
+      label: 'Auto update',
+      description: 'When a new version of the app is available, automatically download and install the update.',
+      input: (
+        <Switch
+          checked={settings.autoUpdateEnabled}
+          onCheckedChange={(checked) => setSettings({ ...settings, autoUpdateEnabled: checked })}
+        />
+      )
+    },
+    {
       label: 'Periodically fetch interval (minutes)',
       description: 'Interval in minutes for fetching all repositories when periodic fetch is enabled.',
       show: settings.periodicallyFetchEnabled,

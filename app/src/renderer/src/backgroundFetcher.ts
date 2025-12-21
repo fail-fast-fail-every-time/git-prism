@@ -23,7 +23,7 @@ async function executeFetchIfIntervalExceeded(): Promise<void> {
     return
   }
 
-  console.log('Execute background fetch')
+  setReposLastFetched(new Date())
 
   let repositories = workspaces.flatMap((w) => w.repositories)
   repositories = distinctBy(repositories, (repo: Repository) => repo.path)
@@ -35,8 +35,6 @@ async function executeFetchIfIntervalExceeded(): Promise<void> {
     })
   )
   await Promise.all(promises)
-
-  setReposLastFetched(new Date())
 }
 
 function shouldFetch(): boolean {
@@ -51,5 +49,11 @@ function shouldFetch(): boolean {
   const timeDiffInMs = new Date().valueOf() - new Date(reposLastFetched).valueOf()
   const timeDiffInMinutes = timeDiffInMs / (1000 * 60)
 
-  return timeDiffInMinutes > settings.periodicallyFetchIntervalMinutes
+  const shouldFetch = timeDiffInMinutes > settings.periodicallyFetchIntervalMinutes
+  if (shouldFetch) {
+    console.log(
+      `Execute background fetch. ${timeDiffInMinutes} minutes since last fetch at ${reposLastFetched}. Configured to fetch every ${settings.periodicallyFetchIntervalMinutes}`
+    )
+  }
+  return shouldFetch
 }
