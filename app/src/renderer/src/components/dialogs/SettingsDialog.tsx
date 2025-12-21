@@ -16,6 +16,7 @@ interface SettingsDialogProps {
 
 export default function SettingsDialog({ onClose }: SettingsDialogProps): ReactElement {
   const existingSettings = useStore((state) => state.settings)
+  const appDataPath = useStore((state) => state.appDataPath)
   const setSettingsInStore = useStore((state) => state.setSettings)
   const [settings, setSettings] = useState({ ...existingSettings })
   const [formError, setFormError] = useState<string | undefined>(undefined)
@@ -29,10 +30,6 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps): ReactE
 
   const validateForm = (): boolean => {
     setFormError(undefined)
-    if (settings.appDataPath.length == 0) {
-      setFormError('App data file path must be provided.')
-      return false
-    }
     if (!settings.concurrency || settings.concurrency < 1) {
       setFormError('Concurrency must be at least 1.')
       return false
@@ -53,7 +50,7 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps): ReactE
       label: 'App data file path',
       description:
         'The location where the app data file is stored. This file contains the list of workspaces, repositories, and various settings.',
-      input: <Input id="appDataPath" defaultValue={settings.appDataPath} onChange={(e) => (settings.appDataPath = e.target.value)} />
+      input: <Input id="appDataPath" defaultValue={appDataPath} disabled={true} />
     },
     {
       label: 'Concurrency',

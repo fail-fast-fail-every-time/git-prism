@@ -3,7 +3,6 @@ import { ExternalGitClient } from './ExternalGitClient'
 import { HourFormat } from './HourFormat'
 
 export default class Settings {
-  public appDataPath: string = './appData.json'
   public concurrency: number = 10
   public recentCommandsToSave: number = 10
   public periodicallyFetchEnabled: boolean = true
