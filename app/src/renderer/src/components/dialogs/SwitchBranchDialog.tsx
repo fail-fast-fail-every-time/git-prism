@@ -25,9 +25,10 @@ export default function SwitchBranchDialog({ onClose, repository }: SwitchBranch
   }
 
   const handleSelectBranch = (branchName: string): void => {
-    const reposToSwitch = repository
-      ? [repository]
-      : selectedRepositories.filter((repo) => repo.branches?.find((b) => b.name == branchName) !== undefined)
+    //Only switch branch for repositories where the branch exists
+    const reposToSwitch = selectedRepositories.filter(
+      (repo) => repo.branches?.find((b) => b.name == branchName || 'remotes/' + branchName === b.name) !== undefined
+    )
     runCommand((r) => r.checkoutBranch(branchName), reposToSwitch)
     onClose()
   }
