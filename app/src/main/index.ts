@@ -58,7 +58,6 @@ function createWindow(): void {
 
   //Register auto updater handlers
   //checkForUpdates is called once the store is initialize and we know if auto update is enabled
-  autoUpdater.forceDevUpdateConfig = true
   ipcMain.handle('checkForUpdates', async () => {
     autoUpdater.checkForUpdates()
   })
