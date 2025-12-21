@@ -3,6 +3,7 @@ import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import iconWin32 from '../../resources/icon.ico?asset'
 import iconLinux from '../../resources/icon.png?asset'
+const { autoUpdater } = require('electron-updater')
 
 async function openFolders(): Promise<string[]> {
   const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -54,6 +55,25 @@ function createWindow(): void {
     }
   })
   ipcMain.on('closeApp', () => mainWindow.close())
+
+  //Register auto updater handlers
+  //checkForUpdates is called once the store is initialize and we know if auto update is enabled
+  autoUpdater.forceDevUpdateConfig = true
+  ipcMain.handle('checkForUpdates', async () => {
+    autoUpdater.checkForUpdates()
+  })
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info.version)
+  })
+  autoUpdater.on('update-not-available', () => {
+    console.log('No updates found.')
+  })
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Update downloaded:', info.version)
+  })
+  autoUpdater.on('error', (err) => {
+    console.error('Update error:', err)
+  })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)

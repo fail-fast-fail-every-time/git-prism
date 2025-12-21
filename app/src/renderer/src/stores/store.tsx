@@ -287,6 +287,12 @@ export const useStore = create<StoreState>()((set, get) => ({
         console.log('Update repositories on window focus')
         get().runCommandOnRepositories((repo) => repo.refresh(), get().getSelectedWorkspace()?.repositories, false, false)
       })
+
+      if (get().settings.autoUpdateEnabled) {
+        console.warn('Auto update is enabled')
+        //Check for updates on startup
+        window.electron.ipcRenderer.invoke('checkForUpdates')
+      }
     }
   }
 }))
