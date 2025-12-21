@@ -100,7 +100,7 @@ export const useStore = create<StoreState>()((set, get) => ({
       return {
         recentBranchesPerRepo: {
           ...state.recentBranchesPerRepo,
-          [repoPath]: [branch, ...filteredBranches].slice(0, 5)
+          [repoPath]: [branch, ...filteredBranches].slice(0, 8)
         }
       }
     })
