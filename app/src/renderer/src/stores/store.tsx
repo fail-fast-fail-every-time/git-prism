@@ -13,7 +13,6 @@ export interface StoreState {
   settings: Settings
   workspaces: Workspace[]
   globalError: string | undefined
-  recentCommands: string[]
   reposLastFetched: Date
   reposProcessing: string[]
   recentBranchesPerRepo: Record<string, string[]>
@@ -23,8 +22,6 @@ export interface StoreState {
   persist: () => void
   setSettings: (settings: Settings) => void
   setReposLastFetched: (date: Date) => void
-  addRecentCommand: (command: string) => void
-  removeRecentCommand: (command: string) => void
   addRepositories: (workspace: Workspace, repos: Repository[]) => void
   addRecentBranch: (repoPath: string, branch: string) => void
   updateRepository: (workspace: Workspace, repos: Repository) => void
@@ -74,21 +71,6 @@ export const useStore = create<StoreState>()((set, get) => ({
   setReposLastFetched: (date: Date): void => {
     set(() => ({
       reposLastFetched: date
-    }))
-    get().persist()
-  },
-  addRecentCommand: (command: string): void => {
-    set((state) => {
-      const filteredCommands = state.recentCommands.filter((c) => c !== command)
-      return {
-        recentCommands: [command, ...filteredCommands].slice(0, state.settings.recentCommandsToSave)
-      }
-    })
-    get().persist()
-  },
-  removeRecentCommand: (command: string): void => {
-    set((state) => ({
-      recentCommands: state.recentCommands.filter((c) => c !== command)
     }))
     get().persist()
   },
