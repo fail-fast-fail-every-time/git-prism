@@ -8,6 +8,7 @@ import pLimit from 'p-limit'
 import { create } from 'zustand'
 
 export interface StoreState {
+  appDataPath: string
   initialized: boolean
   settings: Settings
   workspaces: Workspace[]
@@ -47,6 +48,7 @@ export interface StoreState {
 }
 
 export const useStore = create<StoreState>()((set, get) => ({
+  appDataPath: '',
   initialized: false,
   settings: new Settings(),
   workspaces: [new Workspace('-1', 'Default workspace', [], true)],
@@ -246,7 +248,7 @@ export const useStore = create<StoreState>()((set, get) => ({
   },
   persist: (): void => {
     try {
-      saveStoreToFile(get())
+      saveStoreToFile(get().appDataPath, get())
     } catch (error) {
       set(() => ({
         globalError:
@@ -259,19 +261,21 @@ export const useStore = create<StoreState>()((set, get) => ({
     //Only initialize once
     if (!get().initialized) {
       //Load initial state from appData file
+      let appDataPath: string
       try {
-        const appDataFileState: Partial<StoreState> = await loadStoreFromFile()
+        appDataPath = await window.api.io.getAppDataFilePath()
+        console.log('App data file path: ' + appDataPath)
+        const appDataFileState: Partial<StoreState> = await loadStoreFromFile(appDataPath)
         //Update the store state from the data we pulled from the appdata file
         set(() => ({
           ...appDataFileState,
-          initialized: true
+          initialized: true,
+          appDataPath: appDataPath
         }))
       } catch (error) {
         //If we couldn't read the appdata file, show an error message to the user
         set(() => ({
-          globalError:
-            'Failed to load appdata file. The appdata file is where application data such as workspaces, repositories, etc. are stored. Message: ' +
-            error,
+          globalError: `Failed to load appdata file from ${appDataPath}. The appdata file is where application data such as workspaces, repositories, etc. are stored. Message: ${error}`,
           initialized: true
         }))
       }

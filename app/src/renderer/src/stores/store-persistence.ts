@@ -4,10 +4,6 @@ import Settings from '@/models/Settings'
 import Workspace from '@/models/Workspace'
 import { StoreState } from '@/stores/store'
 
-//Filename of the file that is used to store the app data
-//This file is stored in the current directory of the app
-const APPDATA_FILENAME = 'appData.json'
-
 //Structure of the data that is saved to the file system
 interface AppDataFile {
   settings: Settings
@@ -27,24 +23,25 @@ interface AppDataFile {
   }[]
 }
 
-function saveStoreToFile(state: StoreState): void {
+function saveStoreToFile(appDataPath: string, state: StoreState): void {
+  console.log('Save appdata to file system', appDataPath)
   const appData: AppDataFile = convertStoreStateToAppData(state)
   const appDataJson = JSON.stringify(appData, null, 2)
-  window.api.io.saveFile(APPDATA_FILENAME, appDataJson)
+  window.api.io.saveFile(appDataPath, appDataJson)
 }
 
-async function loadStoreFromFile(): Promise<Partial<StoreState>> {
+async function loadStoreFromFile(appDataPath: string): Promise<Partial<StoreState>> {
   console.log('Load appdata from file system')
 
   //Check if file exists
-  const fileExists = await window.api.io.fileExists(APPDATA_FILENAME)
+  const fileExists = await window.api.io.fileExists(appDataPath)
   if (!fileExists) {
-    console.log('File ' + APPDATA_FILENAME + ' does not exist yet')
+    console.log('File ' + appDataPath + ' does not exist yet')
     return {}
   }
 
   //Pull the content from the file system
-  const fileContent = await window.api.io.loadFile(APPDATA_FILENAME)
+  const fileContent = await window.api.io.loadFile(appDataPath)
   console.log('Loaded appdata from filesystem: ' + fileContent)
 
   //Deserialize file content and map data to StoreState object

@@ -46,6 +46,10 @@ function createWindow(): void {
     mainWindow.show()
   })
 
+  ipcMain.handle('getAppDataFilePath', () => {
+    return join(app.getPath('userData'), 'appData.json')
+  })
+
   ipcMain.on('minimizeApp', () => mainWindow.minimize())
   ipcMain.on('maximizeApp', () => {
     if (mainWindow.isMaximized()) {

@@ -30,7 +30,8 @@ const api = {
     dirname,
     deleteFile,
     joinPaths,
-    exec
+    exec,
+    getAppDataFilePath
   },
   git: {
     status,
@@ -153,6 +154,10 @@ async function exec(command: string, args: string[] = [], cwd?: string): Promise
       resolve({ success, stdout, stderr })
     })
   })
+}
+
+function getAppDataFilePath(): Promise<string> {
+  return ipcRenderer.invoke('getAppDataFilePath')
 }
 
 async function status(path: string): Promise<StatusResult> {

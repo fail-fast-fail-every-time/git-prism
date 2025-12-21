@@ -13,6 +13,7 @@ export interface IApi {
     dirname: (path: string) => string
     joinPaths: (...paths: string[]) => string
     exec: (command: string, options: string[], workingDirectory?: string) => Promise<{ success: boolean; stdout: string; stderr: string }>
+    getAppDataFilePath: () => Promise<string>
   }
   git: {
     status: (path: string) => Promise<StatusResult>
