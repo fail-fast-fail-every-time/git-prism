@@ -288,9 +288,9 @@ export const useStore = create<StoreState>()((set, get) => ({
         get().runCommandOnRepositories((repo) => repo.refresh(), get().getSelectedWorkspace()?.repositories, false, false)
       })
 
+      //Check and download update if available. Installed when the user restarts the app.
       if (get().settings.autoUpdateEnabled) {
-        console.warn('Auto update is enabled')
-        //Check for updates on startup
+        console.log('Auto update is enabled, trigger check for updates')
         window.electron.ipcRenderer.invoke('checkForUpdates')
       }
     }
